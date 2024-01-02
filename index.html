@@ -75,8 +75,8 @@ function getLocation() {
 function showPosition(position) {
 
      liff.getProfile().then(function(profile) {
-            var user = profile.userId;
-            var name = profile.displayName;
+            var uid = profile.userId;
+            var uname = profile.displayName;
         var xos = liff.getOS();
   x.innerHTML = "Lat: " + position.coords.latitude + 
   "<br>Long: " + position.coords.longitude+ 
@@ -84,7 +84,7 @@ function showPosition(position) {
   "<br>displayName: " + name+
   "<br>your OS: " + xos;
 var xmlhttp = new XMLHttpRequest();
-        var theUrl = xurl+"?ctype=In&xos="+xos+"&user="+user+"&name="+name+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
+        var theUrl = xurl+"?ctype=In&xos="+xos+"&user="+uid+"&name="+uname+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
         xmlhttp.open('GET', theUrl);
         xmlhttp.send();
             xmlhttp.onreadystatechange = function() {
@@ -121,7 +121,7 @@ function showPositionOut(position) {
   "<br>displayName: " + name+
   "<br>your OS: " + xos;
 var xmlhttp = new XMLHttpRequest();
-        var theUrl = xurl+"?ctype=Out&xos="+xos+"&user="+user+"&name="+name+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
+        var theUrl = xurl+"?ctype=Out&xos="+xos+"&user="+uid+"&name="+uname+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
         xmlhttp.open('GET', theUrl);
         xmlhttp.send();
             xmlhttp.onreadystatechange = function() {
