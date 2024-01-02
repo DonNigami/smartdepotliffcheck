@@ -8,11 +8,11 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    <title>ITDEV.win</title>
+    <title>NK Check In-OUT</title>
   </head>
   <body>
     <center>
-   <h1>Check-In/Out Log</h1>
+    <h1>Check-In/Out Log</h1>
       
 <p>กดปุ่มด้านล่าง เพื่อบันทึกการลงเข้า </p>
 <div id="cin" class="visible"><button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button></div>
@@ -30,6 +30,7 @@ window.onload = function() {
 }
 
 const xurl = "https://script.google.com/macros/s/AKfycbw4GF8k72O2QfY7V-73WYoZt-8pfBq9UXzCVG6apuYReBEGSv-MekPrR0lTyC08RrTq/exec";
+
 /**
 function checks(){
 
@@ -38,12 +39,12 @@ today.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })
 var hh = today.getHours();
 var mm = today.getMinutes(); 
 
-        if(hh <= 00 && mm <= 0){
+        if(hh <= 3 && mm <= 0){
           document.getElementById("cin").classList.remove('invisible');
-        }else if(hh >= 00 && mm => 0){
+        }else if(hh >= 10 && mm >= 0){
           document.getElementById("cout").classList.remove('invisible');
             }else{
-alert("ไม่สามารถเช็คอิน/เอาท์ได้ในช่วงเวลา 13.00-17.00 "+hh+":"+mm);
+alert("ไม่สามารถเช็คอิน/เอาท์ได้ในช่วงเวลา 00.00-00.00 "+hh+":"+mm);
 liff.closeWindow();  
             }
 }
@@ -55,7 +56,7 @@ function initializeLiff(myLiffId) {
             liffId: myLiffId
         })
         .then(() => {
-          //  checks();
+      
         })
         .catch((err) => {
         });
