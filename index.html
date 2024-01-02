@@ -12,12 +12,14 @@
   </head>
   <body>
     <center>
-    <h1>Check-In/Out Log</h1>
-<p>Click the button to check-in or check-out with your coordinates.</p>
+   <h1>Check-In/Out Log</h1>
       
-<div id="cin" class="invisible"><button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button></div>
+<p>กดปุ่มด้านล่าง เพื่อบันทึกการลงเข้า </p>
+<div id="cin" class="visible"><button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button></div>
+
+<p>กดปุ่ม เพื่อบันทึกเวลาออก </p>
       
-<div id="cout" class="invisible"><button id="cout" type="button" class="btn btn-danger" onclick="getLocationOut()">Check-Out</button></div>
+<div id="cout" class="visible"><button id="cout" type="button" class="btn btn-danger" onclick="getLocationOut()">Check-Out</button></div>
 
 <p id="demo"></p>
 </center>
@@ -28,7 +30,7 @@ window.onload = function() {
 }
 
 const xurl = "https://script.google.com/macros/s/AKfycbw4GF8k72O2QfY7V-73WYoZt-8pfBq9UXzCVG6apuYReBEGSv-MekPrR0lTyC08RrTq/exec";
-
+/**
 function checks(){
 
 var today = new Date();
@@ -45,7 +47,7 @@ alert("ไม่สามารถเช็คอิน/เอาท์ได้
 liff.closeWindow();  
             }
 }
-
+*/
 
 function initializeLiff(myLiffId) {
     liff
@@ -53,7 +55,7 @@ function initializeLiff(myLiffId) {
             liffId: myLiffId
         })
         .then(() => {
-            checks();
+          //  checks();
         })
         .catch((err) => {
         });
