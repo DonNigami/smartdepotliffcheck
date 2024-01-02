@@ -80,11 +80,11 @@ function showPosition(position) {
         var xos = liff.getOS();
   x.innerHTML = "Lat: " + position.coords.latitude + 
   "<br>Long: " + position.coords.longitude+ 
-  "<br>userId: " + user+ 
-  "<br>displayName: " + name+
+  "<br>userId: " + uid+ 
+  "<br>displayName: " + uname+
   "<br>your OS: " + xos;
 var xmlhttp = new XMLHttpRequest();
-        var theUrl = xurl+"?ctype=In&xos="+xos+"&user="+user+"&name="+name+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
+        var theUrl = xurl+"?ctype=In&xos="+xos+"&user="+uid+"&name="+uname+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
         xmlhttp.open('GET', theUrl);
         xmlhttp.send();
             xmlhttp.onreadystatechange = function() {
@@ -117,11 +117,11 @@ function showPositionOut(position) {
         var xos = liff.getOS();
   x.innerHTML = "Lat: " + position.coords.latitude + 
   "<br>Long: " + position.coords.longitude+ 
-  "<br>userId: " + user+ 
-  "<br>displayName: " + name+
+  "<br>userId: " + uid+ 
+  "<br>displayName: " + uname+
   "<br>your OS: " + xos;
 var xmlhttp = new XMLHttpRequest();
-        var theUrl = xurl+"?ctype=Out&xos="+xos+"&user="+user+"&name="+name+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
+        var theUrl = xurl+"?ctype=Out&xos="+xos+"&user="+uid+"&name="+uname+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
         xmlhttp.open('GET', theUrl);
         xmlhttp.send();
             xmlhttp.onreadystatechange = function() {
