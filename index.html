@@ -146,58 +146,68 @@
         });
       }
 
-      function sendFlexMessage(action, latitude, longitude) {
-        const flexMessage = {
-          type: 'flex',
-          altText: `${action} Successful`,
-          contents: {
+function sendFlexMessage(action, latitude, longitude) {
+    const flexMessage = {
+        type: 'flex',
+        altText: `${action} Successful`,
+        contents: {
             type: "bubble",
             body: {
-              type: "box",
-              layout: "vertical",
-              contents: [
-                {
-                  type: "text",
-                  text: `${action} Successful`,
-                  weight: "bold",
-                  size: "xl"
-                },
-                {
-                  type: "text",
-                  text: `Latitude: ${latitude}`,
-                  size: "md"
-                },
-                {
-                  type: "text",
-                  text: `Longitude: ${longitude}`,
-                  size: "md"
-                }
-              ]
+                type: "box",
+                layout: "vertical",
+                contents: [
+                    {
+                        type: "text",
+                        text: `${action} Successful`,
+                        weight: "bold",
+                        size: "xl"
+                    },
+                    {
+                        type: "text",
+                        text: `Latitude: ${latitude}`,
+                        size: "md"
+                    },
+                    {
+                        type: "text",
+                        text: `Longitude: ${longitude}`,
+                        size: "md"
+                    }
+                ]
             }
-          }
-        };
+        }
+    };
 
-        liff.sendMessages([flexMessage])
-          .then(() => {
+    liff
+        .sendMessages([{ type: 'text', text: `Checking ${action}...` }]) // Message for testing
+        .then(() => {
+            return liff.sendMessages([flexMessage]);
+        })
+        .then(() => {
             console.log(`${action} reply message sent successfully`);
-            liff.shareTargetPicker([flexMessage])
-              .then(() => {
-                console.log(`${action} message shared successfully`);
-                liff.closeWindow();
-              })
-              .catch((err) => {
-                console.error('Error sharing message: ', err);
-              });
-          })
-          .catch((err) => {
-            console.error('Error sending reply message: ', err);
             Swal.fire({
-              icon: 'error',
-              title: 'Message Send Failed',
-              text: err.message,
+                icon: 'success',
+                title: 'Message Sent',
+                text: `${action} reply message sent successfully`,
+                showConfirmButton: false,
+                timer: 1500
             });
-          });
-      }
+
+            return liff.shareTargetPicker([flexMessage]);
+        })
+        .then(() => {
+            console.log(`${action} message shared successfully`);
+            liff.closeWindow();
+        })
+        .catch((err) => {
+            console.error('Error sending message: ', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Message Send Failed',
+                text: err.message,
+            });
+        });
+}
+
     </script>
 
     <!-- Optional JavaScript -->
