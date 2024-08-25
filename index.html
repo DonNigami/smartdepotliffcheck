@@ -4,146 +4,206 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
     <title>NK Check In-OUT</title>
   </head>
   <body>
     <center>
     <h1>Check-In/Out Log</h1>
-      
-<p>กดปุ่มด้านล่าง เพื่อบันทึกการลงเข้า </p>
-<div id="cin" class="visible"><button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button></div>
+    <p>กดปุ่มด้านล่าง เพื่อบันทึกการลงเข้า </p>
+    <div id="cin" class="visible"><button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button></div>
+    <p>กดปุ่ม เพื่อบันทึกเวลาออก </p>
+    <div id="cout" class="visible"><button id="cout" type="button" class="btn btn-danger" onclick="getLocationOut()">Check-Out</button></div>
+    <p id="demo"></p>
+    </center>
 
-<p>กดปุ่ม เพื่อบันทึกเวลาออก </p>
-      
-<div id="cout" class="visible"><button id="cout" type="button" class="btn btn-danger" onclick="getLocationOut()">Check-Out</button></div>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<p id="demo"></p>
-</center>
+    <script>
+      window.onload = function() {
+        initializeLiff('2002564550-Vp3B3LzL');
+      }
 
-<script>
-window.onload = function() {
-  initializeLiff('2002564550-Vp3B3LzL');
-}
+      const xurl = "https://script.google.com/macros/s/AKfycbwWV7pT9ajEMagYHF3lK0xIMsN7U6QkKq5IoQteOt1YtoUWF6MUpiRaGWYEtA_iZ3N0/exec";
 
-const xurl = "https://script.google.com/macros/s/AKfycbwWV7pT9ajEMagYHF3lK0xIMsN7U6QkKq5IoQteOt1YtoUWF6MUpiRaGWYEtA_iZ3N0/exec";
+      function initializeLiff(myLiffId) {
+        liff.init({ liffId: myLiffId })
+          .then(() => {})
+          .catch((err) => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to initialize LIFF',
+            });
+          });
+      }
 
-/**
-function checks(){
+      var x = document.getElementById("demo");
 
-var today = new Date();
-today.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })
-var hh = today.getHours();
-var mm = today.getMinutes(); 
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else { 
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Geolocation is not supported by this browser.',
+          });
+        }
+      }
 
-        if(hh <= 3 && mm <= 0){
-          document.getElementById("cin").classList.remove('invisible');
-        }else if(hh >= 10 && mm >= 0){
-          document.getElementById("cout").classList.remove('invisible');
-            }else{
-alert("ไม่สามารถเช็คอิน/เอาท์ได้ในช่วงเวลา 00.00-00.00 "+hh+":"+mm);
-liff.closeWindow();  
+      function showPosition(position) {
+        liff.getProfile().then(function(profile) {
+          var uid = profile.userId;
+          var uname = profile.displayName;
+          var xos = liff.getOS();
+          x.innerHTML = "Lat: " + position.coords.latitude + 
+                        "<br>Long: " + position.coords.longitude + 
+                        "<br>userId: " + uid + 
+                        "<br>displayName: " + uname +
+                        "<br>your OS: " + xos;
+
+          var xmlhttp = new XMLHttpRequest();
+          var theUrl = `${xurl}?ctype=In&xos=${xos}&user=${uid}&name=${uname}&lat=${position.coords.latitude}&long=${position.coords.longitude}`;
+          xmlhttp.open('GET', theUrl);
+          xmlhttp.send();
+          xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              var jsonResponse = JSON.parse(this.responseText);
+              if (jsonResponse.status === 'success') {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Checked In Successfully',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Check-In Failed',
+                  text: jsonResponse.desc,
+                });
+              }
             }
-}
-*/
-
-function initializeLiff(myLiffId) {
-    liff
-        .init({
-            liffId: myLiffId
-        })
-        .then(() => {
-      
-        })
-        .catch((err) => {
+          };
         });
-}
+      }
 
-var x = document.getElementById("demo");
-
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else { 
-    x.innerHTML = "Geolocation is not supported by this browser.";
-  }
-}
-
-function showPosition(position) {
-
-     liff.getProfile().then(function(profile) {
-            var uid = profile.userId;
-            var uname = profile.displayName;
-        var xos = liff.getOS();
-  x.innerHTML = "Lat: " + position.coords.latitude + 
-  "<br>Long: " + position.coords.longitude+ 
-  "<br>userId: " + uid+ 
-  "<br>displayName: " + uname+
-  "<br>your OS: " + xos;
-var xmlhttp = new XMLHttpRequest();
-        var theUrl = xurl+"?ctype=In&xos="+xos+"&user="+uid+"&name="+uname+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
-        xmlhttp.open('GET', theUrl);
-        xmlhttp.send();
-            xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var jsonResponse = JSON.parse(this.responseText);
+      function getLocationOut() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPositionOut);
+        } else { 
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Geolocation is not supported by this browser.',
+          });
         }
-        alert(jsonResponse.desc);
-        liff.closeWindow();
-      }});  
-}
+      }
 
+      function showPositionOut(position) {
+        liff.getProfile().then(function(profile) {
+          var uid = profile.userId;
+          var uname = profile.displayName;
+          var xos = liff.getOS();
+          x.innerHTML = "Lat: " + position.coords.latitude + 
+                        "<br>Long: " + position.coords.longitude + 
+                        "<br>userId: " + uid + 
+                        "<br>displayName: " + uname +
+                        "<br>your OS: " + xos;
 
+          var xmlhttp = new XMLHttpRequest();
+          var theUrl = `${xurl}?ctype=Out&xos=${xos}&user=${uid}&name=${uname}&lat=${position.coords.latitude}&long=${position.coords.longitude}`;
+          xmlhttp.open('GET', theUrl);
+          xmlhttp.send();
+          xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              var jsonResponse = JSON.parse(this.responseText);
+              if (jsonResponse.status === 'success') {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Checked Out Successfully',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Check-Out Failed',
+                  text: jsonResponse.desc,
+                });
+              }
+            }
+          };
+        });
+      }
 
-///////////////////////////////
+      function sendFlexMessage(action, latitude, longitude) {
+        const flexMessage = {
+          type: 'flex',
+          altText: `${action} Successful`,
+          contents: {
+            type: "bubble",
+            body: {
+              type: "box",
+              layout: "vertical",
+              contents: [
+                {
+                  type: "text",
+                  text: `${action} Successful`,
+                  weight: "bold",
+                  size: "xl"
+                },
+                {
+                  type: "text",
+                  text: `Latitude: ${latitude}`,
+                  size: "md"
+                },
+                {
+                  type: "text",
+                  text: `Longitude: ${longitude}`,
+                  size: "md"
+                }
+              ]
+            }
+          }
+        };
 
-
-function getLocationOut() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPositionOut);
-  } else { 
-    x.innerHTML = "Geolocation is not supported by this browser.";
-  }
-}
-
-function showPositionOut(position) {
-
-     liff.getProfile().then(function(profile) {
-            var uid = profile.userId;
-            var uname = profile.displayName;
-        var xos = liff.getOS();
-  x.innerHTML = "Lat: " + position.coords.latitude + 
-  "<br>Long: " + position.coords.longitude+ 
-  "<br>userId: " + uid+ 
-  "<br>displayName: " + uname+
-  "<br>your OS: " + xos;
-var xmlhttp = new XMLHttpRequest();
-        var theUrl = xurl+"?ctype=Out&xos="+xos+"&user="+uid+"&name="+uname+"&lat="+position.coords.latitude+"&long="+position.coords.longitude;
-        xmlhttp.open('GET', theUrl);
-        xmlhttp.send();
-            xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var jsonResponse = JSON.parse(this.responseText);
-        }
-        alert(jsonResponse.desc);
-        liff.closeWindow();
-      }});  
-}
-
-
-
-</script>
-
-
+        liff.sendMessages([flexMessage])
+          .then(() => {
+            console.log(`${action} reply message sent successfully`);
+            liff.shareTargetPicker([flexMessage])
+              .then(() => {
+                console.log(`${action} message shared successfully`);
+                liff.closeWindow();
+              })
+              .catch((err) => {
+                console.error('Error sharing message: ', err);
+              });
+          })
+          .catch((err) => {
+            console.error('Error sending reply message: ', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Message Send Failed',
+              text: err.message,
+            });
+          });
+      }
+    </script>
 
     <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
   </body>
 </html>
