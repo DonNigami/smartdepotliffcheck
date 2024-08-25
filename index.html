@@ -90,6 +90,7 @@
                   title: 'Check-In Failed',
                   text: jsonResponse.desc,
                 });
+                 sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
               }
             }
           };
@@ -140,6 +141,7 @@
                   title: 'Check-Out Failed',
                   text: jsonResponse.desc,
                 });
+                 sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
               }
             }
           };
