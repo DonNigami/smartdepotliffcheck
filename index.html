@@ -63,6 +63,7 @@
           var uid = profile.userId;
           var uname = profile.displayName;
           var xos = liff.getOS();
+          profileImage = profile.pictureUrl;
           x.innerHTML = "Lat: " + position.coords.latitude + 
                         "<br>Long: " + position.coords.longitude + 
                         "<br>userId: " + uid + 
@@ -83,14 +84,14 @@
                   showConfirmButton: false,
                   timer: 1500
                 });
-                sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+                sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude,profile.pictureUrl);
               } else {
                 Swal.fire({
                   icon: 'error',
                   title: 'Check-In Failed',
                   text: jsonResponse.desc,
                 });
-                 sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+                 sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude,profile.pictureUrl);
               }
             }
           };
@@ -114,6 +115,7 @@
           var uid = profile.userId;
           var uname = profile.displayName;
           var xos = liff.getOS();
+          profileImage = profile.pictureUrl;
           x.innerHTML = "Lat: " + position.coords.latitude + 
                         "<br>Long: " + position.coords.longitude + 
                         "<br>userId: " + uid + 
@@ -134,49 +136,75 @@
                   showConfirmButton: false,
                   timer: 1500
                 });
-                sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+                sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude, profile.pictureUrl);
               } else {
                 Swal.fire({
                   icon: 'error',
                   title: 'Check-Out Failed',
                   text: jsonResponse.desc,
                 });
-                 sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+                 sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude,profile.pictureUrl);
               }
             }
           };
         });
       }
 
-function sendFlexMessage(action, latitude, longitude) {
+function sendFlexMessage(action, latitude, longitude, profileImage) {
     const flexMessage = {
         type: 'flex',
         altText: `${action} Successful`,
         contents: {
-            type: "bubble",
-            body: {
-                type: "box",
-                layout: "vertical",
-                contents: [
+    "type": "bubble",
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "md",
+        "contents": [
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
                     {
-                        type: "text",
-                        text: `${action} Successful`,
-                        weight: "bold",
-                        size: "xl"
+                        "type": "image",
+                        "url": `${profileImage}`, // URL ของ Profile Image
+                        "size": "sm",
+                        "aspectMode": "cover",
+                        "aspectRatio": "1:1",
+                        "gravity": "center",
+                        "flex": 0
                     },
                     {
-                        type: "text",
-                        text: `Latitude: ${latitude}`,
-                        size: "md"
-                    },
-                    {
-                        type: "text",
-                        text: `Longitude: ${longitude}`,
-                        size: "md"
+                        "type": "text",
+                        "text": `${uname}`, // Display Name
+                        "weight": "bold",
+                        "size": "md",
+                        "margin": "md",
+                        "flex": 1
                     }
                 ]
+            },
+            {
+                "type": "text",
+                "text": `${action} Successful`, // Action
+                "weight": "bold",
+                "size": "xl",
+                "margin": "md"
+            },
+            {
+                "type": "text",
+                "text": `Latitude: ${latitude}`, // Latitude
+                "size": "md"
+            },
+            {
+                "type": "text",
+                "text": `Longitude: ${longitude}`, // Longitude
+                "size": "md"
             }
-        }
+        ]
+    }
+}
+
     };
 
     liff
