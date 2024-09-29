@@ -13,16 +13,12 @@
   </head>
   <body>
     <center>
-      <h1>Check-In/Out Log</h1>
-      <p>กดปุ่มด้านล่าง เพื่อบันทึกการลงเข้า </p>
-      <div id="cin" class="visible">
-        <button type="button" class="btn btn-success" onclick="getLocation('In')">Check-In</button>
-      </div>
-      <p>กดปุ่ม เพื่อบันทึกเวลาออก </p>
-      <div id="cout" class="visible">
-        <button id="cout" type="button" class="btn btn-danger" onclick="getLocation('Out')">Check-Out</button>
-      </div>
-      <p id="demo"></p>
+    <h1>Check-In/Out Log</h1>
+    <p>กดปุ่มด้านล่าง เพื่อบันทึกการลงเข้า </p>
+    <div id="cin" class="visible"><button type="button" class="btn btn-success" onclick="getLocation()">Check-In</button></div>
+    <p>กดปุ่ม เพื่อบันทึกเวลาออก </p>
+    <div id="cout" class="visible"><button id="cout" type="button" class="btn btn-danger" onclick="getLocationOut()">Check-Out</button></div>
+    <p id="demo"></p>
     </center>
 
     <!-- SweetAlert2 JS -->
@@ -35,145 +31,187 @@
 
       const xurl = "https://script.google.com/macros/s/AKfycbwWV7pT9ajEMagYHF3lK0xIMsN7U6QkKq5IoQteOt1YtoUWF6MUpiRaGWYEtA_iZ3N0/exec";
 
-      async function initializeLiff(myLiffId) {
-        try {
-          await liff.init({ liffId: myLiffId });
-        } catch (err) {
-          console.error(err);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to initialize LIFF',
+      function initializeLiff(myLiffId) {
+        liff.init({ liffId: myLiffId })
+          .then(() => {})
+          .catch((err) => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to initialize LIFF',
+            });
           });
-        }
       }
 
       var x = document.getElementById("demo");
 
-      async function getLocation(type) {
-        try {
-          const position = await getCurrentLocation();
-          await showPosition(position, type);
-        } catch (error) {
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else { 
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: error.message,
+            text: 'Geolocation is not supported by this browser.',
           });
         }
       }
 
-      function getCurrentLocation() {
-        return new Promise((resolve, reject) => {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              position => resolve(position),
-              error => reject(new Error('Geolocation is not supported or permission denied.'))
-            );
-          } else {
-            reject(new Error('Geolocation is not supported by this browser.'));
-          }
+      function showPosition(position) {
+        liff.getProfile().then(function(profile) {
+          var uid = profile.userId;
+          var uname = profile.displayName;
+          var xos = liff.getOS();
+          x.innerHTML = "Lat: " + position.coords.latitude + 
+                        "<br>Long: " + position.coords.longitude + 
+                        "<br>userId: " + uid + 
+                        "<br>displayName: " + uname +
+                        "<br>your OS: " + xos;
+
+          var xmlhttp = new XMLHttpRequest();
+          var theUrl = `${xurl}?ctype=In&xos=${xos}&user=${uid}&name=${uname}&lat=${position.coords.latitude}&long=${position.coords.longitude}`;
+          xmlhttp.open('GET', theUrl);
+          xmlhttp.send();
+          xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              var jsonResponse = JSON.parse(this.responseText);
+              if (jsonResponse.status === 'success') {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'ลงเวลาเข้า สำเร็จ',
+                 confirmButtonText: 'OK'
+                });
+                sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'ลงเวลาเข้า ไม่สำเร็จ',
+                  text: jsonResponse.desc,
+                  confirmButtonText: 'OK'
+                });
+                 //sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+                liff.closeWindow();
+              }
+            }
+          };
         });
       }
 
-      async function showPosition(position, type) {
-        try {
-          const profile = await liff.getProfile();
-          const uid = profile.userId;
-          const uname = profile.displayName;
-          const xos = liff.getOS();
-
-          x.innerHTML = `Lat: ${position.coords.latitude} 
-                         <br>Long: ${position.coords.longitude} 
-                         <br>userId: ${uid} 
-                         <br>displayName: ${uname} 
-                         <br>your OS: ${xos}`;
-
-          const theUrl = `${xurl}?ctype=${type}&xos=${xos}&user=${uid}&name=${uname}&lat=${position.coords.latitude}&long=${position.coords.longitude}`;
-          const response = await fetch(theUrl);
-          const jsonResponse = await response.json();
-
-          if (jsonResponse.status === 'success') {
-            Swal.fire({
-              icon: 'success',
-              title: `ลงเวลา${type === 'In' ? 'เข้า' : 'ออก'} สำเร็จ`,
-              confirmButtonText: 'OK'
-            });
-            sendFlexMessage(type === 'In' ? 'Check In' : 'Check Out', position.coords.latitude, position.coords.longitude);
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: `ลงเวลา${type === 'In' ? 'เข้า' : 'ออก'} ไม่สำเร็จ`,
-              text: jsonResponse.desc,
-              confirmButtonText: 'OK'
-            });
-            liff.closeWindow();
-          }
-        } catch (error) {
-          console.error('Error:', error);
+      function getLocationOut() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPositionOut);
+        } else { 
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Something went wrong!',
+            text: 'Geolocation is not supported by this browser.',
           });
         }
       }
 
-      async function sendFlexMessage(action, latitude, longitude) {
-        const flexMessage = {
-          type: 'flex',
-          altText: `${action} Successful`,
-          contents: {
+      function showPositionOut(position) {
+        liff.getProfile().then(function(profile) {
+          var uid = profile.userId;
+          var uname = profile.displayName;
+          var xos = liff.getOS();
+          x.innerHTML = "Lat: " + position.coords.latitude + 
+                        "<br>Long: " + position.coords.longitude + 
+                        "<br>userId: " + uid + 
+                        "<br>displayName: " + uname +
+                        "<br>your OS: " + xos;
+
+          var xmlhttp = new XMLHttpRequest();
+          var theUrl = `${xurl}?ctype=Out&xos=${xos}&user=${uid}&name=${uname}&lat=${position.coords.latitude}&long=${position.coords.longitude}`;
+          xmlhttp.open('GET', theUrl);
+          xmlhttp.send();
+          xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              var jsonResponse = JSON.parse(this.responseText);
+              if (jsonResponse.status === 'success') {
+                Swal.fire({
+                  icon: 'success',
+                  title: ''ลงเวลาออก สำเร็จ',
+                  confirmButtonText: 'OK'
+                });
+                sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'ลงเวลาออก ไม่สำเร็จ',
+                  text: jsonResponse.desc,
+                  confirmButtonText: 'OK'
+                });
+                // sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+              liff.closeWindow();
+              }
+            }
+          };
+        });
+      }
+
+function sendFlexMessage(action, latitude, longitude) {
+    const flexMessage = {
+        type: 'flex',
+        altText: `${action} Successful`,
+        contents: {
             type: "bubble",
             body: {
-              type: "box",
-              layout: "vertical",
-              contents: [
-                {
-                  type: "text",
-                  text: `${action} Successful`,
-                  weight: "bold",
-                  size: "xl"
-                },
-                {
-                  type: "text",
-                  text: `Latitude: ${latitude}`,
-                  size: "md"
-                },
-                {
-                  type: "text",
-                  text: `Longitude: ${longitude}`,
-                  size: "md"
-                }
-              ]
+                type: "box",
+                layout: "vertical",
+                contents: [
+                    {
+                        type: "text",
+                        text: `${action} Successful`,
+                        weight: "bold",
+                        size: "xl"
+                    },
+                    {
+                        type: "text",
+                        text: `Latitude: ${latitude}`,
+                        size: "md"
+                    },
+                    {
+                        type: "text",
+                        text: `Longitude: ${longitude}`,
+                        size: "md"
+                    }
+                ]
             }
-          }
-        };
-
-        try {
-          await liff.sendMessages([{ type: 'text', text: `Checking ${action}...` }]);
-          await liff.sendMessages([flexMessage]);
-          console.log(`${action} reply message sent successfully`);
-          Swal.fire({
-            icon: 'success',
-            title: 'Message Sent',
-            text: `${action} reply message sent successfully`,
-            showConfirmButton: false,
-            timer: 1500
-          });
-
-          await liff.shareTargetPicker([flexMessage]);
-          console.log(`${action} message shared successfully`);
-          liff.closeWindow();
-        } catch (err) {
-          console.error('Error sending message: ', err);
-          Swal.fire({
-            icon: 'error',
-            title: 'Message Send Failed',
-            text: err.message,
-          });
         }
-      }
+    };
+
+    liff
+        .sendMessages([{ type: 'text', text: `Checking ${action}...` }]) // Message for testing
+        .then(() => {
+            return liff.sendMessages([flexMessage]);
+        })
+        .then(() => {
+            console.log(`${action} reply message sent successfully`);
+            Swal.fire({
+                icon: 'success',
+                title: 'Message Sent',
+                text: `${action} reply message sent successfully`,
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+            return liff.shareTargetPicker([flexMessage]);
+        })
+        .then(() => {
+            console.log(`${action} message shared successfully`);
+            liff.closeWindow();
+        })
+        .catch((err) => {
+            console.error('Error sending message: ', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Message Send Failed',
+                text: err.message,
+            });
+        });
+}
+
     </script>
 
     <!-- Optional JavaScript -->
