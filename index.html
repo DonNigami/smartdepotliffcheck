@@ -194,7 +194,8 @@ function sendFlexMessage(action, latitude, longitude) {
                 timer: 1500
             });
 
-            return liff.shareTargetPicker([flexMessage]);
+           // return liff.shareTargetPicker([flexMessage]);
+           liff.closeWindow();
         })
         .then(() => {
             console.log(`${action} message shared successfully`);
