@@ -90,7 +90,8 @@
                   text: jsonResponse.desc,
                   confirmButtonText: 'OK'
                 });
-                 sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+                 //sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+                liff.closeWindow();
               }
             }
           };
@@ -141,7 +142,8 @@
                   text: jsonResponse.desc,
                   confirmButtonText: 'OK'
                 });
-                 sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+                // sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+              liff.closeWindow();
               }
             }
           };
