@@ -80,17 +80,17 @@
                 Swal.fire({
                   icon: 'success',
                   title: 'Checked In Successfully',
-                  showConfirmButton: false,
-                  timer: 1500
+                 confirmButtonText: 'OK'
                 });
-                sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+                sendFlexMessage('ลงเวลาเข้า สำเร็จ', position.coords.latitude, position.coords.longitude);
               } else {
                 Swal.fire({
                   icon: 'error',
                   title: 'Check-In Failed',
                   text: jsonResponse.desc,
+                  confirmButtonText: 'OK'
                 });
-                 sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
+                 sendFlexMessage('ลงเวลาเข้า ไม่สำเร็จ', position.coords.latitude, position.coords.longitude);
               }
             }
           };
@@ -131,17 +131,17 @@
                 Swal.fire({
                   icon: 'success',
                   title: 'Checked Out Successfully',
-                  showConfirmButton: false,
-                  timer: 1500
+                  confirmButtonText: 'OK'
                 });
-                sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+                sendFlexMessage('ลงเวลาออก สำเร็จ', position.coords.latitude, position.coords.longitude);
               } else {
                 Swal.fire({
                   icon: 'error',
                   title: 'Check-Out Failed',
                   text: jsonResponse.desc,
+                  confirmButtonText: 'OK'
                 });
-                 sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
+                 sendFlexMessage('ลงเวลาออก ไม่สำเร็จ', position.coords.latitude, position.coords.longitude);
               }
             }
           };
