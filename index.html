@@ -79,19 +79,18 @@
               if (jsonResponse.status === 'success') {
                 Swal.fire({
                   icon: 'success',
-                  title: 'ลงเวลาเข้า สำเร็จ',
-                 confirmButtonText: 'OK'
+                  title: 'Checked In Successfully',
+                  showConfirmButton: false,
+                  timer: 1500
                 });
                 sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
               } else {
                 Swal.fire({
                   icon: 'error',
-                  title: 'ลงเวลาเข้า ไม่สำเร็จ',
+                  title: 'Check-In Failed',
                   text: jsonResponse.desc,
-                  confirmButtonText: 'OK'
                 });
-                 //sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
-                liff.closeWindow();
+                 sendFlexMessage('Check In', position.coords.latitude, position.coords.longitude);
               }
             }
           };
@@ -131,19 +130,18 @@
               if (jsonResponse.status === 'success') {
                 Swal.fire({
                   icon: 'success',
-                  title: ''ลงเวลาออก สำเร็จ',
-                  confirmButtonText: 'OK'
+                  title: 'Checked Out Successfully',
+                  showConfirmButton: false,
+                  timer: 1500
                 });
                 sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
               } else {
                 Swal.fire({
                   icon: 'error',
-                  title: 'ลงเวลาออก ไม่สำเร็จ',
+                  title: 'Check-Out Failed',
                   text: jsonResponse.desc,
-                  confirmButtonText: 'OK'
                 });
-                // sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
-              liff.closeWindow();
+                 sendFlexMessage('Check Out', position.coords.latitude, position.coords.longitude);
               }
             }
           };
