@@ -51,17 +51,29 @@
       var x = document.getElementById("demo");
 
       async function getLocation(type) {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(async position => {
-            await showPosition(position, type);
-          });
-        } else { 
+        try {
+          const position = await getCurrentLocation();
+          await showPosition(position, type);
+        } catch (error) {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Geolocation is not supported by this browser.',
+            text: error.message,
           });
         }
+      }
+
+      function getCurrentLocation() {
+        return new Promise((resolve, reject) => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              position => resolve(position),
+              error => reject(new Error('Geolocation is not supported or permission denied.'))
+            );
+          } else {
+            reject(new Error('Geolocation is not supported by this browser.'));
+          }
+        });
       }
 
       async function showPosition(position, type) {
