@@ -196,10 +196,10 @@ function sendFlexMessage(action, latitude, longitude) {
 
            // return liff.shareTargetPicker([flexMessage]);
            liff.closeWindow();
-        })
-        .then(() => {
-            console.log(`${action} message shared successfully`);
-            liff.closeWindow();
+        // })
+        // .then(() => {
+        //     console.log(`${action} message shared successfully`);
+        //     liff.closeWindow();
         })
         .catch((err) => {
             console.error('Error sending message: ', err);
